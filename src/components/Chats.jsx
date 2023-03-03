@@ -1,35 +1,50 @@
+import { onSnapshot, doc } from 'firebase/firestore'
+import { useState, useEffect } from 'react'
+import { db } from '../firebase'
+import { useContext } from 'react'
+import { AuthContext } from '../context/AuthContext'
+import { ChatContext } from '../context/ChatContext'
+
 const Chats = () => {
+  const [chats, setChats] = useState([])
+
+  const { currentUser } = useContext(AuthContext)
+  const { dispatch } = useContext(ChatContext);
+
+  useEffect(() => {
+    const getChats = () => {
+      const unsub = onSnapshot(doc(db, 'userChats', currentUser.uid),
+        (doc) => {
+          setChats(doc.data())
+        })
+
+      return () => {
+        unsub()
+      }
+    }
+
+    currentUser.uid && getChats()
+  }, [currentUser.uid])
+
+  const handleSelect = (u) => {
+    dispatch({ type: 'CHANGE_USER', payload: u });
+  }
+
   return (
     <div className='chats'>
-      <div className='userChat'>
-        <img src='https://media.istockphoto.com/id/1369508766/photo/beautiful-successful-latin-woman-smiling.jpg?s=170667a&w=0&k=20&c=Qg_c17d0FvJuVo0a-P5BvbSgGu87LlWl0gvHhxyriTc=' alt='user' />
-        <div className='userChatInfo'>
-          <span>Jane</span>
-          <p>Hello</p>
+      {Object.entries(chats)?.sort((a, b) => b[1].date - a[1].date).map((chat) => (
+        <div
+          className='userChat'
+          key={chat[0]}
+          onClick={() => handleSelect(chat[1].userInfo)}
+        >
+          <img src={chat[1].userInfo?.photoURL} alt='user' />
+          <div className='userChatInfo'>
+            <span>{chat[1].userInfo?.displayName}</span>
+            <p>{chat[1].lastMessage?.text}</p>
+          </div>
         </div>
-      </div>
-      <div className='userChat'>
-        <img src='https://media.istockphoto.com/id/1369508766/photo/beautiful-successful-latin-woman-smiling.jpg?s=170667a&w=0&k=20&c=Qg_c17d0FvJuVo0a-P5BvbSgGu87LlWl0gvHhxyriTc=' alt='user' />
-        <div className='userChatInfo'>
-          <span>Jane</span>
-          <p>Hello</p>
-        </div>
-      </div>
-      <div className='userChat'>
-        <img src='https://media.istockphoto.com/id/1369508766/photo/beautiful-successful-latin-woman-smiling.jpg?s=170667a&w=0&k=20&c=Qg_c17d0FvJuVo0a-P5BvbSgGu87LlWl0gvHhxyriTc=' alt='user' />
-        <div className='userChatInfo'>
-          <span>Jane</span>
-          <p>Hello</p>
-        </div>
-      </div>
-      <div className='userChat'>
-        <img src='https://media.istockphoto.com/id/1369508766/photo/beautiful-successful-latin-woman-smiling.jpg?s=170667a&w=0&k=20&c=Qg_c17d0FvJuVo0a-P5BvbSgGu87LlWl0gvHhxyriTc=' alt='user' />
-        <div className='userChatInfo'>
-          <span>Jane</span>
-          <p>Hello</p>
-        </div>
-      </div>
-
+      ))}
     </div>
   )
 }
