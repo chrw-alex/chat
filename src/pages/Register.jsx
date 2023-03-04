@@ -5,13 +5,16 @@ import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'
 import { auth, storage, db } from '../firebase.js'
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage'
 import { doc, setDoc } from 'firebase/firestore'
+import Preloader from "./../components/Preloader/Preloader";
 
 const Register = () => {
   const [error, setError] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const navigate = useNavigate()
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    setIsLoading(true)
     const displayName = e.target[0].value
     const email = e.target[1].value
     const password = e.target[2].value
@@ -36,11 +39,12 @@ const Register = () => {
 
           await setDoc(doc(db, 'userChats', res.user.uid), {})
           navigate('/')
+          setIsLoading(false)
         })
       })
     } catch (err) {
-      setError(true)
-      console.log(err)
+      setError(err.message)
+      setIsLoading(false)
     }
   }
 
@@ -58,12 +62,13 @@ const Register = () => {
             <img src={Add} alt='add' />
             <span>Add an avatar</span>
           </label>
-          <button>Sign up</button>
-          {error && <span>Something went wrong</span>}
+          {isLoading ? <Preloader /> : <button>Sign up</button>}
+          {error && <span className='error'>{error}</span>}
         </form>
         <div>
-          <span className='bottom'>You do have account?</span>
-          <Link className='link' to='/login'>Login</Link>
+          <p className='bottom'>You do have account?
+            <Link className='link' to='/login'>Login</Link>
+          </p>
         </div>
       </div>
     </div>

@@ -62,12 +62,26 @@
           width: 32px;
         }
       }
+
+      .error {
+        color: rgb(179, 3, 3);
+        text-align: center;
+      }
     }
     p {
       color: #5d5b8d;
-      font-size: 12px;
+      font-size: 14px;
       margin-top: 10px;
+
+      .link {
+        display: inline;
+        color: #8da4f1;
+        text-decoration: none;
+        margin-left: 4px;
+      }
     }
+
+
   }
 }
 

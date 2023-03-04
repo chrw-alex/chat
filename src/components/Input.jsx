@@ -1,6 +1,5 @@
 import { useContext, useState } from 'react'
 import Img from './../img/img.png'
-import Attach from './../img/attach.png'
 import { AuthContext } from '../context/AuthContext'
 import { ChatContext } from '../context/ChatContext'
 import { arrayUnion, doc, serverTimestamp, Timestamp, updateDoc } from 'firebase/firestore'
@@ -23,7 +22,7 @@ const Input = () => {
 
       uploadTask.on(
         (error) => {
-          //TODO:Handle Error
+          console.log(error)
         },
         () => {
           getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
@@ -76,7 +75,6 @@ const Input = () => {
         value={text}
       />
       <div className='send'>
-        <img src={Attach} alt='attach' />
         <input
           type='file'
           style={{ display: 'none' }}
